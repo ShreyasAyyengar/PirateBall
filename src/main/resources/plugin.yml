@@ -1,0 +1,12 @@
+name: PirateBall
+version: ${project.version}
+main: me.shreyasayyengar.pirateball.PirateBall
+api-version: 1.17
+prefix: PirateBall
+author: Shreyas#0001
+description: Pirate Ball! A custom coded minigame plugin, adapted from the classic game Pirate Ball (Treasure Hunt)
+commands:
+  arena:
+    aliases: [game, pirateball]
+  removeholo:
+  skullball:

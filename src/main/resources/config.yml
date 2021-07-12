@@ -1,0 +1,68 @@
+required-players: 1
+countdown-seconds: 30
+lobby-spawn:
+  world: 'world'
+  x: 100
+  y: 100
+  z: 100
+  pitch: 100
+  yaw: 100
+arenas:
+  '0':
+    spawn:
+      world: 'world'
+      x: 100
+      y: 100
+      z: 100
+      pitch: 100
+      yaw: 100
+    basewool:
+      red:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
+      blue:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
+      yellow:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
+      green:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
+  '1':
+    spawn:
+      world: 'world'
+      x: 100
+      y: 100
+      z: 100
+      pitch: 100
+      yaw: 100
+    basewool:
+      red:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
+      blue:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
+      yellow:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
+      green:
+        world: 'world'
+        x: 100
+        y: 100
+        z: 100
