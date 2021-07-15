@@ -12,4 +12,8 @@ public class ActionBar {
     public static void sendActionBar(Player p, String message) {
         p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
     }
+
+    public static void sendAction(Player p , String message) {
+        PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}"), (byte) 2);
+    }
 }

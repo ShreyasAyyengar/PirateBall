@@ -6,9 +6,11 @@ import me.shreyasayyengar.pirateball.Teams.Team;
 import me.shreyasayyengar.pirateball.Ultils.Config;
 import me.shreyasayyengar.pirateball.Ultils.FloatingItem;
 import me.shreyasayyengar.pirateball.Ultils.Manager;
+import me.shreyasayyengar.pirateball.Ultils.NMS.ActionBar;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Jukebox;
 import org.bukkit.block.Skull;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftSkull;
 import org.bukkit.entity.ArmorStand;
@@ -81,6 +83,7 @@ public class GameListener implements Listener {
                     if (block.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == playerTeam.getTeamWool() &&
                             playerTeam.getTeamZone(playerTeam).isInRegion(player.getLocation())) { // picking their own base
                         e.setCancelled(true);
+                        ActionBar.sendActionBar(player, ChatColor.RED + "You cannot pickup your own ball!");
                         player.sendMessage(ChatColor.RED + "You cannot pickup your own ball!");
                     } else if (!playerTeam.getTeamZone(playerTeam).isInRegion(player.getLocation())) {
                         e.setDropItems(false);
