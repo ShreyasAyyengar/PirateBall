@@ -47,7 +47,6 @@ public class Config {
     public static int getArenaAmount() {
        return main.getConfig().getConfigurationSection("arenas.").getKeys(false).size();
     }
-
     public static Location getTeamBaseWool(int id, String team) {
         return new Location(
                 Bukkit.getWorld(main.getConfig().getString("arenas." + id + ".basewool." + team + ".world")),

@@ -14,22 +14,24 @@ import java.util.UUID;
 public enum Team {
 
 
-    RED(ChatColor.RED + "Red", ChatColor.RED, Color.RED, Material.RED_BANNER, Material.RED_WOOL, Material.RED_STAINED_GLASS, 'a'),
-    BLUE(ChatColor.BLUE + "Blue", ChatColor.BLUE, Color.BLUE, Material.BLUE_BANNER, Material.BLUE_WOOL, Material.BLUE_STAINED_GLASS, 'b'),
-    YELLOW(ChatColor.YELLOW + "Yellow", ChatColor.YELLOW, Color.YELLOW, Material.YELLOW_BANNER, Material.YELLOW_WOOL, Material.YELLOW_STAINED_GLASS, 'c'),
-    GREEN(ChatColor.GREEN + "Green", ChatColor.GREEN, Color.LIME, Material.LIME_BANNER, Material.LIME_WOOL, Material.LIME_STAINED_GLASS, 'd');
+    RED(ChatColor.RED + "Red", ChatColor.RED, "&c", Color.RED, Material.RED_BANNER, Material.RED_WOOL, Material.RED_STAINED_GLASS, 'a'),
+    BLUE(ChatColor.BLUE + "Blue", ChatColor.BLUE, "&9", Color.BLUE, Material.BLUE_BANNER, Material.BLUE_WOOL, Material.BLUE_STAINED_GLASS, 'b'),
+    YELLOW(ChatColor.YELLOW + "Yellow", ChatColor.YELLOW, "&e", Color.YELLOW, Material.YELLOW_BANNER, Material.YELLOW_WOOL, Material.YELLOW_STAINED_GLASS, 'c'),
+    GREEN(ChatColor.GREEN + "Green", ChatColor.GREEN, "&2", Color.LIME, Material.LIME_BANNER, Material.LIME_WOOL, Material.LIME_STAINED_GLASS, 'd');
 
     private final String displayName;
     private final ChatColor chatColor;
+    private final String chatColorChar;
     private final Color color;
     private final Material banner;
     private final Material wool;
     private final Material glass;
     private final char ballChar;
 
-    Team(String displayName, ChatColor chatColor, Color color, Material banner, Material wool, Material glass, char ballChar) {
+    Team(String displayName, ChatColor chatColor, String chatColorChar, Color color, Material banner, Material wool, Material glass, char ballChar) {
         this.displayName = displayName;
         this.chatColor = chatColor;
+        this.chatColorChar = chatColorChar;
         this.color = color;
         this.banner = banner;
         this.wool = wool;
@@ -60,6 +62,10 @@ public enum Team {
 
     public ChatColor getChatColor() {
         return chatColor;
+    }
+
+    public String getChatColorChar() {
+        return chatColorChar;
     }
 
     public char getOwnTeamBallChar() {

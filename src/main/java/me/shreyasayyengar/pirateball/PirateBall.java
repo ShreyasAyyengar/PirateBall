@@ -21,7 +21,6 @@ public class PirateBall extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        super.onEnable();
         PirateBall.instance = this;
         getLogger().info("Starting Up...");
 

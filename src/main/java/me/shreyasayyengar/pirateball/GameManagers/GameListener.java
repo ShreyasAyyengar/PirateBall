@@ -6,11 +6,14 @@ import me.shreyasayyengar.pirateball.Teams.Team;
 import me.shreyasayyengar.pirateball.Ultils.Config;
 import me.shreyasayyengar.pirateball.Ultils.FloatingItem;
 import me.shreyasayyengar.pirateball.Ultils.Manager;
-import me.shreyasayyengar.pirateball.Ultils.NMS.ActionBar;
+
+import static me.shreyasayyengar.pirateball.Ultils.Util.*;
+import static me.shreyasayyengar.pirateball.Ultils.Manager.*;
+import static me.shreyasayyengar.pirateball.GameManagers.GameUtils.*;
+
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Jukebox;
 import org.bukkit.block.Skull;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftSkull;
 import org.bukkit.entity.ArmorStand;
@@ -29,9 +32,11 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
 
 public class GameListener implements Listener {
 
@@ -61,7 +66,7 @@ public class GameListener implements Listener {
         }
 
         if (e.getSlotType().equals(InventoryType.SlotType.ARMOR)) {
-            if (Manager.isPlaying(player)) {
+            if (isPlaying(player)) {
                 e.setCancelled(true);
             }
         }
@@ -70,48 +75,46 @@ public class GameListener implements Listener {
     @EventHandler
     private void onBreak(BlockBreakEvent e) {
 
-        if (Manager.isPlaying(e.getPlayer()) && Manager.getArena(e.getPlayer()).getState().equals(GameState.LIVE)) {
+        if (isPlaying(e.getPlayer()) && getArena(e.getPlayer()).getState().equals(GameState.LIVE)) {
 
             Block block = e.getBlock();
 
             if (block.getType().equals(Material.PLAYER_HEAD)) {
+
                 Skull skull = (Skull) block.getState();
                 Player player = e.getPlayer();
                 Team playerTeam = Manager.getArena(player).getTeam(player);
 
-                if (playerTeam.getOwnTeamBallChar() == skull.getOwningPlayer().getUniqueId().toString().charAt(1)) { // picking up their own ball
-                    if (block.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == playerTeam.getTeamWool() &&
-                            playerTeam.getTeamZone(playerTeam).isInRegion(player.getLocation())) { // picking their own base
+                if (playerIsTakingOwnBalL((CraftSkull) skull, player)) { // picking up their own ball
+                    if (playerIsTakingOwnBallAtOwnBase(block, player)) { // picking their own base ball
                         e.setCancelled(true);
-                        ActionBar.sendActionBar(player, ChatColor.RED + "You cannot pickup your own ball!");
-                        player.sendMessage(ChatColor.RED + "You cannot pickup your own ball!");
+                        sendActionBar(player, colourise("&cYou cannot pick up your own ball!"), 100);
                     } else if (!playerTeam.getTeamZone(playerTeam).isInRegion(player.getLocation())) {
                         e.setDropItems(false);
-                        Manager.getArena(player).dropBallNaturally(e.getBlock(), playerTeam);
+                        dropBallNaturally(e.getBlock(), playerTeam);
 
-                        if (Manager.getArena(player).isInTeamZone((CraftSkull) skull, Team.RED)) {
-                            player.sendTitle(ChatColor.GRAY + "Ball Stolen!", ChatColor.DARK_GRAY + "You stole " + playerTeam.getChatColor() + "your ball " + ChatColor.GRAY + "from " + ChatColor.RED + "red " + ChatColor.DARK_GRAY + "team!", 10, 100, 20);
+                        if (getArena(player).isInTeamZone((CraftSkull) skull, Team.RED)) {
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &cred &8 team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 1, 1);
-                            Manager.getArena(player).sendTeamMessage(Team.RED, "some1 stole you're ball kek");
+                            getArena(player).sendTeamMessage(Team.RED, "some1 stole you're ball kek");
 
-                        } else if (Manager.getArena(player).isInTeamZone((CraftSkull) skull, Team.BLUE)) {
-                            Manager.getArena(player).sendTeamMessage(Team.RED, "bol stoeln");
-                            player.sendTitle(ChatColor.GRAY + "Ball Stolen!", ChatColor.DARK_GRAY + "You stole " + playerTeam.getChatColor() + "your ball " + ChatColor.GRAY + "from " + ChatColor.DARK_BLUE + "blue " + ChatColor.DARK_GRAY + "team!", 10, 100, 20);
+                        } else if (getArena(player).isInTeamZone((CraftSkull) skull, Team.BLUE)) {
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &9blue &8 team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 10, 1);
-                            Manager.getArena(player).sendTeamMessage(Team.BLUE, "some1 stole you're ball kek");
+                            getArena(player).sendTeamMessage(Team.BLUE, "some1 stole you're ball kek");
 
-                        } else if (Manager.getArena(player).isInTeamZone((CraftSkull) skull, Team.YELLOW)) {
-                            player.sendTitle(ChatColor.GRAY + "Ball Stolen!", ChatColor.DARK_GRAY + "You stole " + playerTeam.getChatColor() + "your ball " + ChatColor.GRAY + "from " + ChatColor.YELLOW + "yellow " + ChatColor.DARK_GRAY + "team!", 10, 100, 20);
+                        } else if (getArena(player).isInTeamZone((CraftSkull) skull, Team.YELLOW)) {
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &eyellow &8 team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 10, 1);
-                            Manager.getArena(player).sendTeamMessage(Team.YELLOW, "some1 stole you're ball kek");
+                            getArena(player).sendTeamMessage(Team.YELLOW, "some1 stole you're ball kek");
 
-                        } else if (Manager.getArena(player).isInTeamZone((CraftSkull) skull, Team.GREEN)) {
-                            player.sendTitle(ChatColor.GRAY + "Ball Stolen!", ChatColor.DARK_GRAY + "You stole " + playerTeam.getChatColor() + "your ball " + ChatColor.GRAY + "from " + ChatColor.GREEN + "green " + ChatColor.DARK_GRAY + "team!", 10, 100, 20);
+                        } else if (getArena(player).isInTeamZone((CraftSkull) skull, Team.GREEN)) {
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &2green &8 team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 10, 1);
-                            Manager.getArena(player).sendTeamMessage(Team.GREEN, "some1 stole you're ball kek");
+                            getArena(player).sendTeamMessage(Team.GREEN, "some1 stole you're ball kek");
                         }
                     }
-                } else if (playerTeam.getOwnTeamBallChar() != skull.getOwningPlayer().getUniqueId().toString().charAt(1)) {
+                } else if (playerIsTakingOwnBalL((CraftSkull) skull, player)) {
                     e.setCancelled(true);
                     player.sendMessage(ChatColor.RED + "You cannot pick up another ball's team!");
                 }
@@ -133,18 +136,19 @@ public class GameListener implements Listener {
         Block block = e.getBlock();
         Team playerTeam = Manager.getArena(player).getTeam(player);
 
-        if (!Manager.isPlaying(player) && !player.isOp()) {
+        if (!isPlaying(player) && !player.isOp()) {
             e.setCancelled(true);
         } else {
             e.setCancelled(false);
         }
 
-        if (Manager.isPlaying(e.getPlayer()) && Manager.getArena(e.getPlayer()).getState().equals(GameState.LIVE)) { // if live game
+        if (isPlaying(e.getPlayer()) && getArena(e.getPlayer()).getState().equals(GameState.LIVE)) { // if live game
 
             if (block.getType() == Material.PLAYER_HEAD) { // if skull (ball) is placed
                 Skull skull = (Skull) block.getState();
 
-                if (playerTeam.getOwnTeamBallChar() == skull.getOwningPlayer().getUniqueId().toString().charAt(1)) { // placing their own colour ball
+//                if (playerTeam.getOwnTeamBallChar() == skull.getOwningPlayer().getUniqueId().toString().charAt(1)) { // placing their own colour ball
+                if (playerIsTakingOwnBalL((CraftSkull) skull, player)) {
 
                     if (block.getRelative(BlockFace.DOWN).getType() == Material.END_PORTAL_FRAME) {
                         if (playerTeam.getTeamZone(playerTeam).isBlockInTeamZone(block, playerTeam)) {
@@ -155,23 +159,24 @@ public class GameListener implements Listener {
                             player.getInventory().getItemInMainHand().setAmount(player.getInventory().getItemInMainHand().getAmount() - 1);
                         } else {
                             e.setCancelled(true);
-                            player.sendMessage(ChatColor.RED + "That's not where that goes!");
+                            sendActionBar(player, colourise("&4That's not where that goes!"), 100);
+//                            player.sendMessage(ChatColor.RED + "That's not where that goes!");
                         }
                     } else if (block.getRelative(BlockFace.DOWN).getType() != Material.END_PORTAL_FRAME || (!playerTeam.getTeamZone(playerTeam).isBlockInTeamZone(block, playerTeam))) {
                         e.setCancelled(true);
                         player.sendMessage(ChatColor.RED + "You can only place your ball in your " + ChatColor.BOLD + "team pod.");
+                        sendActionBar(player, colourise("&cYou can only place your ball in " + playerTeam.getChatColorChar() + "your team pod"));
                     }
                 } else {
                     e.setCancelled(true);
-                    player.sendMessage(ChatColor.BLACK + "IDK how you even got the other team's ball " + ChatColor.RED + "but no!!");
+                    player.sendMessage(colourise("&0IDK how you even got the other team's ball &cbut no!!"));
                 }
-
             }
 
             if (block.getType() == Material.PLAYER_WALL_HEAD) {
                 e.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "You cannot place a ball on a wall.");
-
+                sendActionBar(player, colourise("&cYou cannot place a ball on a wall"), 100);
+//                player.sendMessage(ChatColor.RED + "You cannot place a ball on a wall.");
             }
         }
     }
@@ -187,24 +192,24 @@ public class GameListener implements Listener {
 
 
                     if (!armorStand.getEquipment().getHelmet().getItemMeta().getDisplayName().equals(playerTeam.getTeamBall(playerTeam).getItemMeta().getDisplayName())) {
-                        if (
-                                Math.round(armorStand.getLocation().getX()) == Math.round(player.getLocation().getX()) &&
-                                        Math.round(armorStand.getLocation().getZ()) == Math.round(player.getLocation().getZ()) &&
-                                        Math.round(armorStand.getLocation().getY()) == Math.round(player.getLocation().getY())) {
-                            player.teleport(Config.getArenaSpawn(Manager.getArena(player).getId()));
+                        if (Math.round(armorStand.getLocation().getX()) == Math.round(player.getLocation().getX()) &&
+                                Math.round(armorStand.getLocation().getZ()) == Math.round(player.getLocation().getZ()) &&
+                                Math.round(armorStand.getLocation().getY()) == Math.round(player.getLocation().getY())) {
+                            player.sendTitle(colourise("&cYou have been hit!"), colourise("&7You will repspawn shortly"), 10, 100, 10);
+                            player.teleport(Config.getArenaSpawn(getArena(player).getId()));
                         } else if (
                                 Math.round(armorStand.getLocation().getX()) == Math.round(player.getLocation().getX()) &&
                                         Math.round(armorStand.getLocation().getZ()) == Math.round(player.getLocation().getZ()) &&
                                         Math.round(armorStand.getLocation().getY()) == Math.round(player.getLocation().getY() + 1)) {
-                            player.sendMessage(ChatColor.LIGHT_PURPLE + "Hit by armor stand L");
-                            player.teleport(Config.getArenaSpawn(Manager.getArena(player).getId()));
+                            player.sendTitle(colourise("&cYou have been hit!"), colourise("&7You will repspawn shortly"), 10, 100, 10);
+                            player.teleport(Config.getArenaSpawn(getArena(player).getId()));
 
                         } else if (
                                 Math.round(armorStand.getLocation().getX()) == Math.round(player.getLocation().getX()) &&
                                         Math.round(armorStand.getLocation().getZ()) == Math.round(player.getLocation().getZ()) &&
                                         Math.round(armorStand.getLocation().getY()) == Math.round(player.getLocation().getY() - 1)) {
-                            player.sendMessage(ChatColor.LIGHT_PURPLE + "Hit by armor stand L");
-                            player.teleport(Config.getArenaSpawn(Manager.getArena(player).getId()));
+                            player.sendTitle(colourise("&cYou have been hit!"), colourise("&7You will repspawn shortly"), 10, 100, 10);
+                            player.teleport(Config.getArenaSpawn(getArena(player).getId()));
                         }
                     }
                 }
@@ -227,7 +232,7 @@ public class GameListener implements Listener {
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
             if (e.getItem().getType() == Material.PLAYER_HEAD) {
 
-                ArmorStand as = (ArmorStand) player.getWorld().spawnEntity(new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY() + 1, player.getLocation().getZ()), EntityType.ARMOR_STAND);
+                ArmorStand as = (ArmorStand) player.getWorld().spawnEntity(getPlayerLocationPlus1(player), EntityType.ARMOR_STAND);
 
                 as.setVelocity(new Vector(playerHead.getX() * 3.5, playerHead.getY() * 2, playerHead.getZ() * 3.5));
                 as.setInvulnerable(true);
@@ -250,9 +255,11 @@ public class GameListener implements Listener {
 
     @EventHandler
     private void onQuit(PlayerQuitEvent e) {
-        if (Manager.isPlaying(e.getPlayer())) {
-            Manager.getArena(e.getPlayer()).removePlayer(e.getPlayer());
-            Manager.getArena(e.getPlayer()).sendMessage(ChatColor.BLACK + "" + e.getPlayer() + "left!");
+        Player player = e.getPlayer();
+        if (isPlaying(player)) {
+            getArena(player).removePlayer(e.getPlayer());
+            getArena(player).sendMessage(colourise("&0" + player.getName() + " left!"));
+//            getArena(e.getPlayer()).sendMessage(ChatColor.BLACK + "" + e.getPlayer() + "left!");
         }
     }
 
@@ -260,9 +267,9 @@ public class GameListener implements Listener {
     private void onDamage(EntityDamageEvent e) {
 
         if (e.getEntity() instanceof Player player) {
-            if (!Manager.isPlaying(player)) {
+            if (!isPlaying(player)) {
                 e.setCancelled(true);
-            } else if (Manager.isPlaying(player) && !Manager.getArena(player).getState().equals(GameState.LIVE)) {
+            } else if (isPlaying(player) && !getArena(player).getState().equals(GameState.LIVE)) {
                 e.setCancelled(true);
             }
         }
@@ -271,15 +278,12 @@ public class GameListener implements Listener {
     @EventHandler
     private void onHit(EntityDamageByEntityEvent e) {
 
-        if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+        if (e.getDamager() instanceof Player damager && e.getEntity() instanceof Player victim) {
 
-            Player damager = (Player) e.getDamager();
-            Player victim = (Player) e.getEntity();
+            if (isPlaying(damager) && isPlaying(victim)) {
 
-            if (Manager.isPlaying(damager) && Manager.isPlaying(victim)) {
-
-                if (Manager.getArena(damager) == Manager.getArena(victim)) {
-                    if (Manager.getArena(damager).getTeam(damager) == Manager.getArena(victim).getTeam(victim)) {
+                if (getArena(damager) == getArena(victim)) {
+                    if (getArena(damager).getTeam(damager) == getArena(victim).getTeam(victim)) {
                         e.setCancelled(true);
                     }
                 } else {
@@ -298,6 +302,11 @@ public class GameListener implements Listener {
 
     @EventHandler
     private void onWeatherChange(WeatherChangeEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onPlayerHandSwitch(PlayerSwapHandItemsEvent e) {
         e.setCancelled(true);
     }
 }

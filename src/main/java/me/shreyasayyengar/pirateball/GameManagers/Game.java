@@ -33,7 +33,7 @@ public class Game {
             Player player = Bukkit.getPlayer(uuid);
             points.put(uuid, 0);
             Bukkit.getPlayer(uuid).closeInventory();
-            Arena.setArmor(player, arena.getTeam(player).getColor(), arena.getTeam(player));
+            GameUtils.setArmor(player, arena.getTeam(player).getColor(), arena.getTeam(player));
         }
     }
 
