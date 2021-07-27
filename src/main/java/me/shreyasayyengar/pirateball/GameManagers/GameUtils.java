@@ -2,16 +2,20 @@ package me.shreyasayyengar.pirateball.GameManagers;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import me.shreyasayyengar.pirateball.PirateBall;
 import me.shreyasayyengar.pirateball.Teams.Team;
 import me.shreyasayyengar.pirateball.Ultils.Manager;
+import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftSkull;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,45 +23,36 @@ import java.util.UUID;
 
 public class GameUtils {
 
+    private ArrayList<Player> currentlyRespawining;
+
     public static boolean playerIsTakingOwnBalL(CraftSkull skull, Player player) {
         return Manager.getArena(player).getTeam(player).getOwnTeamBallChar() == skull.getOwningPlayer().getUniqueId().toString().charAt(1);
     }
 
-    public static boolean playerIsTakingOwnBallAtOwnBase(Block block, Player player) {
+    public static boolean playerIsTakingOwnBallAtOwnBase(CraftSkull block, Player player) {
         return block.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Manager.getArena(player).getTeam(player).getTeamWool()
                 && Manager.getArena(player).getTeam(player).getTeamZone(Manager.getArena(player).getTeam(player)).isInRegion(player.getLocation());
     }
 
     public static void setArmor(Player player, Color colour, Team team) {
 
-        ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
-        LeatherArmorMeta helmetArmorMeta = (LeatherArmorMeta) helmet.getItemMeta();
-        helmetArmorMeta.setColor(colour);
-        helmetArmorMeta.setDisplayName(team.getDisplayName() + " Team");
-        helmet.setItemMeta(helmetArmorMeta);
+        ItemStack[] armor = {
+                new ItemStack(Material.LEATHER_BOOTS),
+                new ItemStack(Material.LEATHER_LEGGINGS),
+                new ItemStack(Material.LEATHER_CHESTPLATE),
+                new ItemStack(Material.LEATHER_HELMET)
+        };
 
-        ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
-        LeatherArmorMeta chestplateArmorMeta = (LeatherArmorMeta) chestplate.getItemMeta();
-        chestplateArmorMeta.setColor(colour);
-        chestplateArmorMeta.setDisplayName(team.getDisplayName() + " Team");
-        chestplate.setItemMeta(chestplateArmorMeta);
+        LeatherArmorMeta teamArmor = (LeatherArmorMeta) (new ItemStack(Material.LEATHER_HELMET)).getItemMeta();
+        teamArmor.setColor(colour);
+        teamArmor.setDisplayName(team.getDisplayName() + " Team");
 
-        ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
-        LeatherArmorMeta leggingArmorMeta = (LeatherArmorMeta) leggings.getItemMeta();
-        leggingArmorMeta.setColor(colour);
-        leggingArmorMeta.setDisplayName(team.getDisplayName() + " Team");
-        leggings.setItemMeta(leggingArmorMeta);
+        for (ItemStack piece : armor) {
+            piece.setItemMeta(teamArmor);
+        }
 
-        ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
-        LeatherArmorMeta bootsArmorMeta = (LeatherArmorMeta) boots.getItemMeta();
-        bootsArmorMeta.setColor(colour);
-        bootsArmorMeta.setDisplayName(team.getDisplayName() + " Team");
-        boots.setItemMeta(bootsArmorMeta);
+        player.getInventory().setArmorContents(armor);
 
-        player.getInventory().setHelmet(helmet);
-        player.getInventory().setChestplate(chestplate);
-        player.getInventory().setLeggings(leggings);
-        player.getInventory().setBoots(boots);
     }
 
     public static void dropBallNaturally(Block block, Team team) {
@@ -164,5 +159,36 @@ public class GameUtils {
 
     public static Location getPlayerLocationPlus1(Player player) {
         return new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY() + 1, player.getLocation().getZ());
+    }
+
+    public static void setDeath(Player player) {
+
+        final int[] seconds = {5};
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+
+                if (seconds[0] == 0) {
+                    player.sendMessage(ChatColor.GREEN + "Respawned");
+                    player.setGameMode(GameMode.SURVIVAL);
+                    GameUtils.setArmor(player, Manager.getArena(player).getTeam(player).getColor(), Manager.getArena(player).getTeam(player));
+                    EntityPlayer NMSPlayer = ((CraftPlayer) player).getHandle();
+
+                    for (Player loopedPlayer : Bukkit.getOnlinePlayers()) {
+                        loopedPlayer.showPlayer(PirateBall.getInstance(), player);
+
+                    }
+                    cancel();
+                } else if (seconds[0] == 1) {
+                    player.sendTitle(ChatColor.RED + "You've been hit by a ball!", ChatColor.GRAY + "Respawning in " + ChatColor.YELLOW + seconds[0] + ChatColor.GRAY + " second", 0, 25, 0);
+                } else {
+                    player.sendTitle(ChatColor.RED + "You've been hit by a ball!", ChatColor.GRAY + "Respawning in " + ChatColor.YELLOW + seconds[0] + ChatColor.GRAY + " seconds", 0, 25, 0);
+                    player.getInventory().clear();
+                }
+
+                seconds[0]--;
+            }
+        }.runTaskTimer(PirateBall.getInstance(), 0, 20);
     }
 }

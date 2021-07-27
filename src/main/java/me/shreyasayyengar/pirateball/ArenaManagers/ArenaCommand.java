@@ -15,15 +15,12 @@ public class ArenaCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
 
-        if (commandSender instanceof Player) {
-
-            Player player = (Player) commandSender;
+        if (commandSender instanceof Player player) {
 
             if (args.length == 1 && args[0].equalsIgnoreCase("team")) {
                 if (Manager.isPlaying(player)) {
                     if (Manager.getArena(player).getState().equals(GameState.COUNTDOWN) ||
                             Manager.getArena(player).getState().equals(GameState.WAITING)) {
-
                         new TeamsGUI(player);
 
                     } else {

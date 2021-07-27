@@ -1,17 +1,16 @@
 package me.shreyasayyengar.pirateball.GameManagers;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
+import lombok.Getter;
 import me.shreyasayyengar.pirateball.ArenaManagers.Arena;
+import me.shreyasayyengar.pirateball.PirateBall;
 import me.shreyasayyengar.pirateball.Teams.Team;
-import me.shreyasayyengar.pirateball.Ultils.Config;
 import me.shreyasayyengar.pirateball.Ultils.FloatingItem;
 import me.shreyasayyengar.pirateball.Ultils.Manager;
-
-import static me.shreyasayyengar.pirateball.Ultils.Util.*;
-import static me.shreyasayyengar.pirateball.Ultils.Manager.*;
-import static me.shreyasayyengar.pirateball.GameManagers.GameUtils.*;
-
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
@@ -27,6 +26,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -37,10 +37,20 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+
+import static me.shreyasayyengar.pirateball.GameManagers.GameUtils.*;
+import static me.shreyasayyengar.pirateball.Ultils.Manager.getArena;
+import static me.shreyasayyengar.pirateball.Ultils.Manager.isPlaying;
+import static me.shreyasayyengar.pirateball.Ultils.Util.colourise;
+import static me.shreyasayyengar.pirateball.Ultils.Util.sendActionBar;
 
 public class GameListener implements Listener {
 
     private final Arena arena;
+    private Player thrower;
+    @Getter
+    private ArrayList<Player> currentlyRespawning;
 
     public GameListener(Arena arena) {
         this.arena = arena;
@@ -86,7 +96,7 @@ public class GameListener implements Listener {
                 Team playerTeam = Manager.getArena(player).getTeam(player);
 
                 if (playerIsTakingOwnBalL((CraftSkull) skull, player)) { // picking up their own ball
-                    if (playerIsTakingOwnBallAtOwnBase(block, player)) { // picking their own base ball
+                    if (playerIsTakingOwnBallAtOwnBase((CraftSkull) skull, player)) { // picking their own base ball
                         e.setCancelled(true);
                         sendActionBar(player, colourise("&cYou cannot pick up your own ball!"), 100);
                     } else if (!playerTeam.getTeamZone(playerTeam).isInRegion(player.getLocation())) {
@@ -94,27 +104,27 @@ public class GameListener implements Listener {
                         dropBallNaturally(e.getBlock(), playerTeam);
 
                         if (getArena(player).isInTeamZone((CraftSkull) skull, Team.RED)) {
-                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &cred &8 team!"), 10, 100, 20);
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &cred &8team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 1, 1);
                             getArena(player).sendTeamMessage(Team.RED, "some1 stole you're ball kek");
 
                         } else if (getArena(player).isInTeamZone((CraftSkull) skull, Team.BLUE)) {
-                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &9blue &8 team!"), 10, 100, 20);
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &9blue &8team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 10, 1);
                             getArena(player).sendTeamMessage(Team.BLUE, "some1 stole you're ball kek");
 
                         } else if (getArena(player).isInTeamZone((CraftSkull) skull, Team.YELLOW)) {
-                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &eyellow &8 team!"), 10, 100, 20);
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &eyellow &8team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 10, 1);
                             getArena(player).sendTeamMessage(Team.YELLOW, "some1 stole you're ball kek");
 
                         } else if (getArena(player).isInTeamZone((CraftSkull) skull, Team.GREEN)) {
-                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &2green &8 team!"), 10, 100, 20);
+                            player.sendTitle(colourise("&7Ball Stolen!"), colourise("&8You stole " + playerTeam.getChatColorChar() + "your ball &7from &2green &8team!"), 10, 100, 20);
                             player.playSound(player.getLocation(), Sound.ENTITY_EVOKER_FANGS_ATTACK, 10, 1);
                             getArena(player).sendTeamMessage(Team.GREEN, "some1 stole you're ball kek");
                         }
                     }
-                } else if (playerIsTakingOwnBalL((CraftSkull) skull, player)) {
+                } else if (!playerIsTakingOwnBalL((CraftSkull) skull, player)) {
                     e.setCancelled(true);
                     player.sendMessage(ChatColor.RED + "You cannot pick up another ball's team!");
                 }
@@ -136,18 +146,13 @@ public class GameListener implements Listener {
         Block block = e.getBlock();
         Team playerTeam = Manager.getArena(player).getTeam(player);
 
-        if (!isPlaying(player) && !player.isOp()) {
-            e.setCancelled(true);
-        } else {
-            e.setCancelled(false);
-        }
+        e.setCancelled(!isPlaying(player) && !player.isOp());
 
-        if (isPlaying(e.getPlayer()) && getArena(e.getPlayer()).getState().equals(GameState.LIVE)) { // if live game
+        if (isPlaying(e.getPlayer()) && getArena(e.getPlayer()).getState().equals(GameState.LIVE)) {
 
-            if (block.getType() == Material.PLAYER_HEAD) { // if skull (ball) is placed
+            if (block.getType() == Material.PLAYER_HEAD) {
                 Skull skull = (Skull) block.getState();
 
-//                if (playerTeam.getOwnTeamBallChar() == skull.getOwningPlayer().getUniqueId().toString().charAt(1)) { // placing their own colour ball
                 if (playerIsTakingOwnBalL((CraftSkull) skull, player)) {
 
                     if (block.getRelative(BlockFace.DOWN).getType() == Material.END_PORTAL_FRAME) {
@@ -157,10 +162,10 @@ public class GameListener implements Listener {
                             floatingBall.spawn(new ItemStack(playerTeam.getTeamBall(playerTeam)), true);
                             e.setCancelled(true);
                             player.getInventory().getItemInMainHand().setAmount(player.getInventory().getItemInMainHand().getAmount() - 1);
+                            player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2, 1);
                         } else {
                             e.setCancelled(true);
                             sendActionBar(player, colourise("&4That's not where that goes!"), 100);
-//                            player.sendMessage(ChatColor.RED + "That's not where that goes!");
                         }
                     } else if (block.getRelative(BlockFace.DOWN).getType() != Material.END_PORTAL_FRAME || (!playerTeam.getTeamZone(playerTeam).isBlockInTeamZone(block, playerTeam))) {
                         e.setCancelled(true);
@@ -182,7 +187,7 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityMove(EntityMoveEvent e) {
+    private void onEntityMove(EntityMoveEvent e) {
         if (e.getEntity().getType() == EntityType.ARMOR_STAND) {
             ArmorStand armorStand = (ArmorStand) e.getEntity();
             if (armorStand.getEquipment().getHelmet().getType() == Material.PLAYER_HEAD) {
@@ -190,34 +195,16 @@ public class GameListener implements Listener {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     Team playerTeam = Manager.getArena(player).getTeam(player);
 
-
                     if (!armorStand.getEquipment().getHelmet().getItemMeta().getDisplayName().equals(playerTeam.getTeamBall(playerTeam).getItemMeta().getDisplayName())) {
-                        if (Math.round(armorStand.getLocation().getX()) == Math.round(player.getLocation().getX()) &&
-                                Math.round(armorStand.getLocation().getZ()) == Math.round(player.getLocation().getZ()) &&
-                                Math.round(armorStand.getLocation().getY()) == Math.round(player.getLocation().getY())) {
-                            player.sendTitle(colourise("&cYou have been hit!"), colourise("&7You will repspawn shortly"), 10, 100, 10);
-                            player.teleport(Config.getArenaSpawn(getArena(player).getId()));
-                        } else if (
-                                Math.round(armorStand.getLocation().getX()) == Math.round(player.getLocation().getX()) &&
-                                        Math.round(armorStand.getLocation().getZ()) == Math.round(player.getLocation().getZ()) &&
-                                        Math.round(armorStand.getLocation().getY()) == Math.round(player.getLocation().getY() + 1)) {
-                            player.sendTitle(colourise("&cYou have been hit!"), colourise("&7You will repspawn shortly"), 10, 100, 10);
-                            player.teleport(Config.getArenaSpawn(getArena(player).getId()));
-
-                        } else if (
-                                Math.round(armorStand.getLocation().getX()) == Math.round(player.getLocation().getX()) &&
-                                        Math.round(armorStand.getLocation().getZ()) == Math.round(player.getLocation().getZ()) &&
-                                        Math.round(armorStand.getLocation().getY()) == Math.round(player.getLocation().getY() - 1)) {
-                            player.sendTitle(colourise("&cYou have been hit!"), colourise("&7You will repspawn shortly"), 10, 100, 10);
-                            player.teleport(Config.getArenaSpawn(getArena(player).getId()));
+                        if (armorStand.getLocation().getNearbyPlayers(0.36777).contains(player) && Math.round(armorStand.getLocation().getY()) - 1.5 <= Math.round(player.getLocation().getY())) {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "say HITHITHITHIT");
                         }
                     }
                 }
             }
 
             if (armorStand.getLocation().getY() == 5.0) {
-                armorStand.getLocation().getBlock().setType(armorStand.getEquipment().getHelmet().getType());
-                armorStand.remove();
+//                armorStand.remove();
             }
         }
     }
@@ -231,6 +218,8 @@ public class GameListener implements Listener {
 
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
             if (e.getItem().getType() == Material.PLAYER_HEAD) {
+
+                this.thrower = player;
 
                 ArmorStand as = (ArmorStand) player.getWorld().spawnEntity(getPlayerLocationPlus1(player), EntityType.ARMOR_STAND);
 
@@ -286,6 +275,10 @@ public class GameListener implements Listener {
                     if (getArena(damager).getTeam(damager) == getArena(victim).getTeam(victim)) {
                         e.setCancelled(true);
                     }
+
+                    if (currentlyRespawning.contains(damager)) {
+                        e.setCancelled(true);
+                    }
                 } else {
                     e.setCancelled(true);
                 }
@@ -309,4 +302,17 @@ public class GameListener implements Listener {
     private void onPlayerHandSwitch(PlayerSwapHandItemsEvent e) {
         e.setCancelled(true);
     }
+
+    @EventHandler
+    private void onPlayerDeath(PlayerDeathEvent e) {
+        Player player = e.getEntity().getPlayer();
+
+        e.setCancelled(true);
+        setDeath(e.getEntity().getPlayer());
+
+        for (Player loopedPlayer : Bukkit.getOnlinePlayers()) {
+            loopedPlayer.hidePlayer(PirateBall.getInstance(), player);
+        }
+    }
+
 }

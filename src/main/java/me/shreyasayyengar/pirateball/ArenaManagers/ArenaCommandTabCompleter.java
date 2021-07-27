@@ -12,7 +12,7 @@ public class ArenaCommandTabCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String label, String[] args) {
 
-        List<String> arguments = Arrays.asList("join", "leave", "list", "team", "help");
+        List<String> arguments = Arrays.asList("join", "pee", "list", "team", "help");
         List<String> flist = Lists.newArrayList();
         if (args.length == 1) {
             for (String s : arguments) {

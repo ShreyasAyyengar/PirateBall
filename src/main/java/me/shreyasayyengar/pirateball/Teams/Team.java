@@ -6,13 +6,11 @@ import me.shreyasayyengar.pirateball.ArenaManagers.CuboidRegion;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.checkerframework.checker.units.qual.C;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
 
 public enum Team {
-
 
     RED(ChatColor.RED + "Red", ChatColor.RED, "&c", Color.RED, Material.RED_BANNER, Material.RED_WOOL, Material.RED_STAINED_GLASS, 'a'),
     BLUE(ChatColor.BLUE + "Blue", ChatColor.BLUE, "&9", Color.BLUE, Material.BLUE_BANNER, Material.BLUE_WOOL, Material.BLUE_STAINED_GLASS, 'b'),
@@ -38,7 +36,6 @@ public enum Team {
         this.glass = glass;
         this.ballChar = ballChar;
     }
-
 
     public String getDisplayName() {
         return this.displayName;
