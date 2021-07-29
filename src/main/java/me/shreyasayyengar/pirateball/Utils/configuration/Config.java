@@ -1,4 +1,4 @@
-package me.shreyasayyengar.pirateball.Ultils;
+package me.shreyasayyengar.pirateball.Utils.configuration;
 
 import me.shreyasayyengar.pirateball.PirateBall;
 import org.bukkit.Bukkit;
@@ -47,13 +47,5 @@ public class Config {
     public static int getArenaAmount() {
        return main.getConfig().getConfigurationSection("arenas.").getKeys(false).size();
     }
-    public static Location getTeamBaseWool(int id, String team) {
-        return new Location(
-                Bukkit.getWorld(main.getConfig().getString("arenas." + id + ".basewool." + team + ".world")),
-                main.getConfig().getInt("arenas." + id + ".basewool." + team + ".x"),
-                main.getConfig().getInt("arenas." + id + ".basewool." + team + ".y"),
-                main.getConfig().getInt("arenas." + id + ".basewool." + team + ".z"));
-    }
-
 }
 

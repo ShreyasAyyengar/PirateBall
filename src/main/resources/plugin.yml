@@ -8,5 +8,6 @@ description: Pirate Ball! A custom coded minigame plugin, adapted from the class
 commands:
   arena:
     aliases: [game, pirateball]
-  removeholo:
+  debug:
   skullball:
+  config:

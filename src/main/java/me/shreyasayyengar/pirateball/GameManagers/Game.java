@@ -9,10 +9,13 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static me.shreyasayyengar.pirateball.GameManagers.GameUtils.setArmor;
+
 public class Game {
 
     private final Arena arena;
     private final HashMap<UUID, Integer> points;
+    private GameUtils utils;
 
 
     public Game(Arena arena) {
@@ -33,7 +36,7 @@ public class Game {
             Player player = Bukkit.getPlayer(uuid);
             points.put(uuid, 0);
             Bukkit.getPlayer(uuid).closeInventory();
-            GameUtils.setArmor(player, arena.getTeam(player).getColor(), arena.getTeam(player));
+            setArmor(player, arena.getTeam(player).getColor(), arena.getTeam(player));
         }
     }
 

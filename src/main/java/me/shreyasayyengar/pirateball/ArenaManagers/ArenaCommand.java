@@ -2,18 +2,19 @@ package me.shreyasayyengar.pirateball.ArenaManagers;
 
 import me.shreyasayyengar.pirateball.GameManagers.GameState;
 import me.shreyasayyengar.pirateball.Teams.TeamsGUI;
-import me.shreyasayyengar.pirateball.Ultils.Config;
-import me.shreyasayyengar.pirateball.Ultils.Manager;
+import me.shreyasayyengar.pirateball.Utils.configuration.Config;
+import me.shreyasayyengar.pirateball.Utils.Manager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class ArenaCommand implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, String[] args) {
 
         if (commandSender instanceof Player player) {
 

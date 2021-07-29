@@ -1,24 +1,19 @@
 package me.shreyasayyengar.pirateball.ArenaManagers;
 
 import com.google.common.collect.TreeMultimap;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import lombok.Getter;
 import lombok.Setter;
 import me.shreyasayyengar.pirateball.GameManagers.Game;
 import me.shreyasayyengar.pirateball.GameManagers.GameState;
 import me.shreyasayyengar.pirateball.Teams.Team;
-import me.shreyasayyengar.pirateball.Ultils.Config;
-import me.shreyasayyengar.pirateball.Ultils.Countdown;
-import org.bukkit.*;
-import org.bukkit.block.Block;
+import me.shreyasayyengar.pirateball.Utils.Countdown;
+import me.shreyasayyengar.pirateball.Utils.configuration.Config;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftSkull;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -126,9 +121,7 @@ public class Arena {
     }
 
     public void removeTeam(Player player) {
-        if (teams.containsKey(player.getUniqueId())) {
-            teams.remove(player.getUniqueId());
-        }
+        teams.remove(player.getUniqueId());
     }
 
     public Team getTeam(Player player) {

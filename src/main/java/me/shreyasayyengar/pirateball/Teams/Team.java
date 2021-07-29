@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public enum Team {
@@ -42,31 +43,31 @@ public enum Team {
     }
 
     public Material getBannerMaterial() {
-        return banner;
+        return this.banner;
     }
 
     public Material getTeamWool() {
-        return wool;
+        return this.wool;
     }
 
     public Material getTeamGlass() {
-        return glass;
+        return this.glass;
     }
 
     public Color getColor() {
-        return color;
+        return this.color;
     }
 
     public ChatColor getChatColor() {
-        return chatColor;
+        return this.chatColor;
     }
 
     public String getChatColorChar() {
-        return chatColorChar;
+        return this.chatColorChar;
     }
 
     public char getOwnTeamBallChar() {
-        return ballChar;
+        return this.ballChar;
     }
 
     public CuboidRegion getTeamZone(Team team) {
@@ -95,88 +96,96 @@ public enum Team {
         return null;
     }
 
-    public ItemStack getTeamBall(Team team) {
+    public static ItemStack getTeamBall(Team team) {
+
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+        GameProfile gameProfile = null;
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add(ChatColor.GRAY + "This ball is 1 of 4 balls that ");
 
         switch (team) {
             case RED -> {
-                ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-                SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
                 skullMeta.setDisplayName(ChatColor.RED + "Red Ball");
 
-                GameProfile gameProfile = new GameProfile(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTMzYTViZmM4YTJhM2ExNTJkNjQ2YTViZWE2OTRhNDI1YWI3OWRiNjk0YjIxNGYxNTZjMzdjNzE4M2FhIn19fQ=="));
-                Field field;
-                try {
-                    field = skullMeta.getClass().getDeclaredField("profile");
-                    field.setAccessible(true);
-                    field.set(skullMeta, gameProfile);
-                } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException x) {
-                    x.printStackTrace();
-                }
-
-                skull.setItemMeta(skullMeta);
-                return skull;
+                gameProfile = new GameProfile(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), null);
+                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.RED)));
+                lore.add(ChatColor.GRAY + "belongs to the " + ChatColor.RED + "red " + ChatColor.GRAY + "team.");
             }
             case BLUE -> {
-                ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-                SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-                skullMeta.setDisplayName(ChatColor.DARK_BLUE + "Red Ball");
+                skullMeta.setDisplayName(team.getChatColor() + "Blue Ball");
 
-                GameProfile gameProfile = new GameProfile(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDExMzdiOWJmNDM1YzRiNmI4OGZhZWFmMmU0MWQ4ZmQwNGUxZDk2NjNkNmY2M2VkM2M2OGNjMTZmYzcyNCJ9fX0="));
-                Field field;
-                try {
-                    field = skullMeta.getClass().getDeclaredField("profile");
-                    field.setAccessible(true);
-                    field.set(skullMeta, gameProfile);
-                } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException x) {
-                    x.printStackTrace();
-                }
-
-                skull.setItemMeta(skullMeta);
-                return skull;
+                gameProfile = new GameProfile(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), null);
+                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.BLUE)));
+                lore.add(ChatColor.GRAY + "belongs to the " + team.getChatColor() + "blue " + ChatColor.GRAY + "team.");
             }
             case YELLOW -> {
-                ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-                SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-                skullMeta.setDisplayName(ChatColor.YELLOW + "Red Ball");
+                skullMeta.setDisplayName(team.getChatColor() + "Yellow Ball");
 
-                GameProfile gameProfile = new GameProfile(UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDExMzliM2VmMmU0YzQ0YTRjOTgzZjExNGNiZTk0OGQ4YWI1ZDRmODc5YTVjNjY1YmI4MjBlNzM4NmFjMmYifX19"));
-                Field field;
-                try {
-                    field = skullMeta.getClass().getDeclaredField("profile");
-                    field.setAccessible(true);
-                    field.set(skullMeta, gameProfile);
-                } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException x) {
-                    x.printStackTrace();
-                }
-
-                skull.setItemMeta(skullMeta);
-                return skull;
+                gameProfile = new GameProfile(UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"), null);
+                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.YELLOW)));
+                lore.add(ChatColor.GRAY + "belongs to the " + team.getChatColor() + "yellow " + ChatColor.GRAY + "team.");
             }
             case GREEN -> {
-                ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-                SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-                skullMeta.setDisplayName(ChatColor.GREEN + "Red Ball");
+                skullMeta.setDisplayName(team.getChatColor() + "Green Ball");
 
-                GameProfile gameProfile = new GameProfile(UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODU0ODRmNGI2MzY3Yjk1YmIxNjI4ODM5OGYxYzhkZDZjNjFkZTk4OGYzYTgzNTZkNGMzYWU3M2VhMzhhNDIifX19="));
-                Field field;
-                try {
-                    field = skullMeta.getClass().getDeclaredField("profile");
-                    field.setAccessible(true);
-                    field.set(skullMeta, gameProfile);
-                } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException x) {
-                    x.printStackTrace();
-                }
-
-                skull.setItemMeta(skullMeta);
-                return skull;
-            }
-            default -> {
-                return null;
+                gameProfile = new GameProfile(UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd"), null);
+                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.GREEN)));
+                lore.add(ChatColor.GRAY + "belongs to the " + team.getChatColor() + "green " + ChatColor.GRAY + "team.");
             }
         }
+
+        try {
+            Field field;
+            field = skullMeta.getClass().getDeclaredField("profile");
+            field.setAccessible(true);
+            field.set(skullMeta, gameProfile);
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException x) {
+            x.printStackTrace();
+        }
+
+        skullMeta.setLore(lore);
+        skull.setItemMeta(skullMeta);
+        return skull;
+    }
+
+    public String getTeamBallTexture(Team team) {
+
+        switch (team) {
+            case RED -> {
+                return "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTMzYTViZmM4YTJhM2ExNTJkNjQ2YTViZWE2OTRhNDI1YWI3OWRiNjk0YjIxNGYxNTZjMzdjNzE4M2FhIn19fQ";
+            }
+            case BLUE -> {
+                return "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDExMzdiOWJmNDM1YzRiNmI4OGZhZWFmMmU0MWQ4ZmQwNGUxZDk2NjNkNmY2M2VkM2M2OGNjMTZmYzcyNCJ9fX0";
+            }
+            case YELLOW -> {
+                return "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDExMzliM2VmMmU0YzQ0YTRjOTgzZjExNGNiZTk0OGQ4YWI1ZDRmODc5YTVjNjY1YmI4MjBlNzM4NmFjMmYifX19";
+            }
+            case GREEN -> {
+                return "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODU0ODRmNGI2MzY3Yjk1YmIxNjI4ODM5OGYxYzhkZDZjNjFkZTk4OGYzYTgzNTZkNGMzYWU3M2VhMzhhNDIifX19";
+            }
+        }
+        return "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2FmMDM5YmVjMWZjMWZiNzUxOTYwOTJiMjZlNjMxZjM3YTg3ZGZmMTQzZmMxODI5Nzc5OGQ0N2M1ZWFhZiJ9fX0="; // white
+    }
+
+    public UUID getBallUUID(Team team) {
+        switch (team) {
+            case RED -> {
+                return UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+            }
+
+            case BLUE -> {
+                return UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+            }
+
+            case YELLOW -> {
+                return UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc");
+            }
+
+            case GREEN -> {
+                return UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd");
+            }
+        }
+        return null;
     }
 }

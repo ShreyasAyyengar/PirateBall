@@ -1,7 +1,8 @@
-package me.shreyasayyengar.pirateball.Ultils;
+package me.shreyasayyengar.pirateball.Utils;
 
 import me.shreyasayyengar.pirateball.ArenaManagers.Arena;
 import me.shreyasayyengar.pirateball.GameManagers.GameState;
+import me.shreyasayyengar.pirateball.Utils.configuration.Config;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -24,6 +25,15 @@ public class Manager {
     public static boolean isPlaying(Player player) {
         for (Arena arena : arenas) {
             if (arena.getPlayers().contains(player.getUniqueId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isPlayingLive(Player player) {
+        for (Arena arena : arenas) {
+            if (arena.getPlayers().contains(player.getUniqueId()) && arena.getState() == GameState.LIVE) {
                 return true;
             }
         }

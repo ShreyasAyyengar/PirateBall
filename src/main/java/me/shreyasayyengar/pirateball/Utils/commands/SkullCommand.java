@@ -1,4 +1,4 @@
-package me.shreyasayyengar.pirateball.Ultils;
+package me.shreyasayyengar.pirateball.Utils.commands;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -46,7 +46,6 @@ public class SkullCommand implements CommandExecutor {
 
                             skull.setItemMeta(skullMeta);
                             player.getLocation().getWorld().dropItemNaturally(player.getLocation(), skull);
-                            break;
                         }
                         case "blue" -> {
                             ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
@@ -71,7 +70,6 @@ public class SkullCommand implements CommandExecutor {
 
                             skull.setItemMeta(skullMeta);
                             player.getLocation().getWorld().dropItemNaturally(player.getLocation(), skull);
-                            break;
                         }
                         case "yellow" -> {
                             ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
@@ -98,7 +96,6 @@ public class SkullCommand implements CommandExecutor {
 
                             skull.setItemMeta(skullMeta);
                             player.getLocation().getWorld().dropItemNaturally(player.getLocation(), skull);
-                            break;
                         }
                         case "green" -> {
                             ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
@@ -123,7 +120,6 @@ public class SkullCommand implements CommandExecutor {
 
                             skull.setItemMeta(skullMeta);
                             player.getLocation().getWorld().dropItemNaturally(player.getLocation(), skull);
-                            break;
                         }
                     }
                 }

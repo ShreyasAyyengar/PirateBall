@@ -1,4 +1,4 @@
-package me.shreyasayyengar.pirateball.Ultils;
+package me.shreyasayyengar.pirateball.Utils;
 
 import com.google.common.collect.Lists;
 import org.bukkit.Location;
@@ -13,11 +13,12 @@ import java.util.List;
 
 public class FloatingItem {
 
-    private static List<FloatingItem> items = new ArrayList<>();
-    private Location location, sameLocation;
+    private static final List<FloatingItem> items = new ArrayList<>();
+    private final Location location;
+    private Location sameLocation;
     private ArmorStand armorStand;
     private boolean floatLoop;
-    private List<ArmorStand> texts = new ArrayList<>();
+    private final List<ArmorStand> texts = new ArrayList<>();
 
     public FloatingItem(Location location) {
         this.location = location;
@@ -35,7 +36,7 @@ public class FloatingItem {
 
         this.sameLocation = armorStand.getLocation();
 
-        addText(this, text);
+        addText(text);
     }
 
     public void update() {
@@ -61,8 +62,8 @@ public class FloatingItem {
         }
     }
 
-    private void addText(FloatingItem floatingItem, String... text) {
-        ArmorStand armorStand = null;
+    private void addText(String... text) {
+        ArmorStand armorStand;
         List<String> lines = Arrays.asList(text);
         lines = Lists.reverse(lines);
 

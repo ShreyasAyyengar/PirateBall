@@ -1,8 +1,9 @@
-package me.shreyasayyengar.pirateball.Ultils;
+package me.shreyasayyengar.pirateball.Utils;
 
 import me.shreyasayyengar.pirateball.ArenaManagers.Arena;
 import me.shreyasayyengar.pirateball.GameManagers.GameState;
 import me.shreyasayyengar.pirateball.PirateBall;
+import me.shreyasayyengar.pirateball.Utils.configuration.Config;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
