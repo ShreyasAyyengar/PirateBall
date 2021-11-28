@@ -15,8 +15,6 @@ public class Game {
 
     private final Arena arena;
     private final HashMap<UUID, Integer> points;
-    private GameUtils utils;
-
 
     public Game(Arena arena) {
         this.arena = arena;

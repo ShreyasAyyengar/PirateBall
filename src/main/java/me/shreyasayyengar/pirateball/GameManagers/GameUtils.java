@@ -21,7 +21,11 @@ import java.util.ArrayList;
 
 public class GameUtils {
 
-    public ArrayList<Player> currentlyRespawning = new ArrayList<>();
+    public static ArrayList<Player> CURRENTLY_RESPAWNING = new ArrayList<>();
+
+    public static void porcessValidSteal(CraftSkull skull, Player player) {
+
+    }
 
     public static boolean playerIsTakingOwnBalL(CraftSkull skull, Player player) {
         return Manager.getArena(player).getTeam(player).getOwnTeamBallChar() == skull.getOwningPlayer().getUniqueId().toString().charAt(1);
@@ -53,14 +57,13 @@ public class GameUtils {
 
     }
 
-    public static void dropBallNaturally(Block block, Team team) {
-        block.getWorld().dropItemNaturally(block.getLocation(), Team.getTeamBall(team));
+    public static void dropBallNaturally(Block block, Player player) {
+        block.getWorld().dropItemNaturally(block.getLocation(), Manager.getArena(player).getTeam(player).getTeamBall());
     }
 
     public static Location getPlayerLocationPlus1(Player player) {
         return new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY() + 1, player.getLocation().getZ());
     }
-
 
     public static GameProfile getSkullGameProfile(Team team) {
         GameProfile texture = new GameProfile(team.getBallUUID(team), null);
@@ -77,9 +80,8 @@ public class GameUtils {
         block.getState().update(true);
     }
 
-
-    public void setDeath(Player player, RespawnReason reason) {
-        currentlyRespawning.add(player);
+    public static void setDeath(Player player, RespawnReason reason) {
+        CURRENTLY_RESPAWNING.add(player);
 
         String title = null;
         String subtitle = ChatColor.GRAY + "Moving to jail in ";
@@ -107,7 +109,7 @@ public class GameUtils {
                     player.sendMessage(ChatColor.GREEN + "Respawned");
                     player.setGameMode(GameMode.SURVIVAL);
                     setArmor(player, Manager.getArena(player).getTeam(player).getColor(), Manager.getArena(player).getTeam(player));
-                    currentlyRespawning.remove(player);
+                    CURRENTLY_RESPAWNING.remove(player);
 
                     for (Player loopedPlayer : Bukkit.getOnlinePlayers()) {
                         loopedPlayer.showPlayer(PirateBall.getInstance(), player);
@@ -126,7 +128,7 @@ public class GameUtils {
         }.runTaskTimer(PirateBall.getInstance(), 0, 20);
     }
 
-    public boolean isPlayerRespawning(Player player) {
-        return this.currentlyRespawning.contains(player);
+    public static boolean isPlayerRespawning(Player player) {
+        return CURRENTLY_RESPAWNING.contains(player);
     }
 }

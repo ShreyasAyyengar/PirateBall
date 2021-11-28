@@ -2,12 +2,13 @@ package me.shreyasayyengar.pirateball.Teams;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import me.shreyasayyengar.pirateball.ArenaManagers.Arena;
 import me.shreyasayyengar.pirateball.ArenaManagers.CuboidRegion;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_17_R1.block.CraftSkull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -96,7 +97,7 @@ public enum Team {
         return null;
     }
 
-    public static ItemStack getTeamBall(Team team) {
+    public ItemStack getTeamBall() {
 
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
@@ -104,48 +105,34 @@ public enum Team {
         ArrayList<String> lore = new ArrayList<>();
         lore.add(ChatColor.GRAY + "This ball is 1 of 4 balls that ");
 
-        switch (team) {
+        switch (this) {
             case RED -> {
                 skullMeta.setDisplayName(ChatColor.RED + "Red Ball");
-
                 gameProfile = new GameProfile(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.RED)));
+                gameProfile.getProperties().put("textures", new Property("textures", this.getTeamBallTexture(Team.RED)));
                 lore.add(ChatColor.GRAY + "belongs to the " + ChatColor.RED + "red " + ChatColor.GRAY + "team.");
             }
             case BLUE -> {
-                skullMeta.setDisplayName(team.getChatColor() + "Blue Ball");
-
+                skullMeta.setDisplayName(this.getChatColor() + "Blue Ball");
                 gameProfile = new GameProfile(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.BLUE)));
-                lore.add(ChatColor.GRAY + "belongs to the " + team.getChatColor() + "blue " + ChatColor.GRAY + "team.");
+                gameProfile.getProperties().put("textures", new Property("textures", this.getTeamBallTexture(Team.BLUE)));
+                lore.add(ChatColor.GRAY + "belongs to the " + this.getChatColor() + "blue " + ChatColor.GRAY + "team.");
             }
             case YELLOW -> {
-                skullMeta.setDisplayName(team.getChatColor() + "Yellow Ball");
-
+                skullMeta.setDisplayName(this.getChatColor() + "Yellow Ball");
                 gameProfile = new GameProfile(UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.YELLOW)));
-                lore.add(ChatColor.GRAY + "belongs to the " + team.getChatColor() + "yellow " + ChatColor.GRAY + "team.");
+                gameProfile.getProperties().put("textures", new Property("textures", this.getTeamBallTexture(Team.YELLOW)));
+                lore.add(ChatColor.GRAY + "belongs to the " + this.getChatColor() + "yellow " + ChatColor.GRAY + "team.");
             }
             case GREEN -> {
-                skullMeta.setDisplayName(team.getChatColor() + "Green Ball");
-
+                skullMeta.setDisplayName(this.getChatColor() + "Green Ball");
                 gameProfile = new GameProfile(UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd"), null);
-                gameProfile.getProperties().put("textures", new Property("textures", team.getTeamBallTexture(Team.GREEN)));
-                lore.add(ChatColor.GRAY + "belongs to the " + team.getChatColor() + "green " + ChatColor.GRAY + "team.");
+                gameProfile.getProperties().put("textures", new Property("textures", this.getTeamBallTexture(Team.GREEN)));
+                lore.add(ChatColor.GRAY + "belongs to the " + this.getChatColor() + "green " + ChatColor.GRAY + "team.");
             }
         }
 
-        try {
-            Field field;
-            field = skullMeta.getClass().getDeclaredField("profile");
-            field.setAccessible(true);
-            field.set(skullMeta, gameProfile);
-        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException x) {
-            x.printStackTrace();
-        }
-
-        skullMeta.setLore(lore);
-        skull.setItemMeta(skullMeta);
+        Arena.applySkullTexture(skull, skullMeta, gameProfile, lore);
         return skull;
     }
 
@@ -187,5 +174,9 @@ public enum Team {
             }
         }
         return null;
+    }
+
+    public boolean isSkullInTeamZone(CraftSkull block) {
+        return getTeamZone(this).isInRegion(block.getLocation());
     }
 }

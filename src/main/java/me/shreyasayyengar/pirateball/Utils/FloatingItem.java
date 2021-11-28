@@ -15,16 +15,25 @@ public class FloatingItem {
 
     private static final List<FloatingItem> items = new ArrayList<>();
     private final Location location;
+    private final List<ArmorStand> texts = new ArrayList<>();
     private Location sameLocation;
     private ArmorStand armorStand;
     private boolean floatLoop;
-    private final List<ArmorStand> texts = new ArrayList<>();
 
     public FloatingItem(Location location) {
         this.location = location;
         this.floatLoop = true;
 
         items.add(this);
+    }
+
+    public static void deleteAll() {
+        getFloatingItems().forEach(FloatingItem::delete);
+        getFloatingItems().clear();
+    }
+
+    public static List<FloatingItem> getFloatingItems() {
+        return items;
     }
 
     public void spawn(ItemStack itemStack, boolean big, String... text) {
@@ -50,8 +59,7 @@ public class FloatingItem {
 
             if (armorStand.getLocation().getY() > (0.25 + sameLocation.getY()))
                 this.floatLoop = true;
-        }
-        else {
+        } else {
             location.subtract(0, 0.01, 0);
             location.setYaw((location.getYaw() - 7.5F));
 
@@ -93,15 +101,6 @@ public class FloatingItem {
 
     public void reset() {
         getFloatingItems().remove(this);
-    }
-
-    public static void deleteAll() {
-        getFloatingItems().forEach(FloatingItem::delete);
-        getFloatingItems().clear();
-    }
-
-    public static List<FloatingItem> getFloatingItems() {
-        return items;
     }
 
     public List<ArmorStand> getTexts() {

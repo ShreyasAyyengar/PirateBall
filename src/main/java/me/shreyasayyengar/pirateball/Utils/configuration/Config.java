@@ -10,7 +10,7 @@ public class Config {
 
     public Config(PirateBall main) {
         Config.main = main;
-        main.getConfig().options().configuration();
+        main.getConfig().options().copyDefaults();
         main.saveDefaultConfig();
     }
 

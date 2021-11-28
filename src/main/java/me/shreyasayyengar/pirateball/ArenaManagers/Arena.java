@@ -1,42 +1,34 @@
 package me.shreyasayyengar.pirateball.ArenaManagers;
 
 import com.google.common.collect.TreeMultimap;
-import lombok.Getter;
-import lombok.Setter;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import me.shreyasayyengar.pirateball.GameManagers.Game;
 import me.shreyasayyengar.pirateball.GameManagers.GameState;
 import me.shreyasayyengar.pirateball.Teams.Team;
 import me.shreyasayyengar.pirateball.Utils.Countdown;
 import me.shreyasayyengar.pirateball.Utils.configuration.Config;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_17_R1.block.CraftSkull;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class Arena {
 
-    @Getter
     private final int id;
-    @Getter
     private final ArrayList<UUID> players;
-    @Getter
     private final ArrayList<Team> totalTeams;
-    @Getter
     private final HashMap<UUID, Team> teams;
-    @Getter
-    private Game game;
-
-
-    @Getter
-    @Setter
-    private GameState state;
+    private final ArrayList<me.shreyasayyengar.pirateball.GameManagers.Team> team = new ArrayList<>();
     private final Location spawn;
     private final Location lbySpawn;
+    private Game game;
+    private GameState state;
     private Countdown countdown;
 
     public Arena(int id) {
@@ -49,6 +41,110 @@ public class Arena {
         lbySpawn = Config.getLobbySpawn();
         state = GameState.WAITING;
         game = new Game(this);
+
+        initTeams();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public ArrayList<UUID> getPlayers() {
+        return players;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public void setState(GameState state) {
+        this.state = state;
+    }
+
+    private void initTeams() {
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+        GameProfile gameProfile = null;
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add(ChatColor.GRAY + "This ball is 1 of 4 balls that ");
+
+        {
+            skullMeta.setDisplayName(ChatColor.RED + "Red Ball");
+            gameProfile = new GameProfile(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), null);
+            gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTMzYTViZmM4YTJhM2ExNTJkNjQ2YTViZWE2OTRhNDI1YWI3OWRiNjk0YjIxNGYxNTZjMzdjNzE4M2FhIn19fQ"));
+            lore.add(ChatColor.GRAY + "belongs to the " + ChatColor.RED + "red " + ChatColor.GRAY + "team.");
+
+            applySkullTexture(skull, skullMeta, gameProfile, lore);
+
+
+            team.add(new me.shreyasayyengar.pirateball.GameManagers.Team("Red",
+                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTMzYTViZmM4YTJhM2ExNTJkNjQ2YTViZWE2OTRhNDI1YWI3OWRiNjk0YjIxNGYxNTZjMzdjNzE4M2FhIn19fQ",
+                    ChatColor.RED, Color.RED, "&c", 'a',
+                    Material.RED_BANNER, Material.RED_WOOL, Material.RED_STAINED_GLASS,
+                    new CuboidRegion("world", new Location(Bukkit.getWorld("world"), 58, 16, 58), new Location(Bukkit.getWorld("world"), 9, 0, 9)),
+                    UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), skull, new ArrayList<>()));
+        }
+
+        {
+            skullMeta.setDisplayName(ChatColor.BLUE + "Blue Ball");
+            gameProfile = new GameProfile(UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), null);
+            gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDExMzdiOWJmNDM1YzRiNmI4OGZhZWFmMmU0MWQ4ZmQwNGUxZDk2NjNkNmY2M2VkM2M2OGNjMTZmYzcyNCJ9fX0"));
+            lore.add(ChatColor.GRAY + "belongs to the " + ChatColor.BLUE + "blue " + ChatColor.GRAY + "team.");
+
+            applySkullTexture(skull, skullMeta, gameProfile, lore);
+
+            team.add(new me.shreyasayyengar.pirateball.GameManagers.Team("Blue",
+                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDExMzdiOWJmNDM1YzRiNmI4OGZhZWFmMmU0MWQ4ZmQwNGUxZDk2NjNkNmY2M2VkM2M2OGNjMTZmYzcyNCJ9fX0",
+                    ChatColor.BLUE, Color.BLUE, "&9", 'b',
+                    Material.BLUE_BANNER, Material.BLUE_WOOL, Material.BLUE_STAINED_GLASS,
+                    new CuboidRegion("world", new Location(Bukkit.getWorld("world"), 58, 16, -41), new Location(Bukkit.getWorld("world"), 9, 0, 7)),
+                    UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), skull, new ArrayList<>()));
+        }
+
+        {
+            gameProfile = new GameProfile(UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"), null);
+            gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDExMzliM2VmMmU0YzQ0YTRjOTgzZjExNGNiZTk0OGQ4YWI1ZDRmODc5YTVjNjY1YmI4MjBlNzM4NmFjMmYifX19"));
+            lore.add(ChatColor.GRAY + "belongs to the " + ChatColor.YELLOW + "yellow " + ChatColor.GRAY + "team.");
+
+            applySkullTexture(skull, skullMeta, gameProfile, lore);
+
+            team.add(new me.shreyasayyengar.pirateball.GameManagers.Team("Yellow",
+                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDExMzliM2VmMmU0YzQ0YTRjOTgzZjExNGNiZTk0OGQ4YWI1ZDRmODc5YTVjNjY1YmI4MjBlNzM4NmFjMmYifX19",
+                    ChatColor.YELLOW, Color.YELLOW, "&e", 'c',
+                    Material.YELLOW_BANNER, Material.YELLOW_WOOL, Material.YELLOW_STAINED_GLASS,
+                    new CuboidRegion("world", new Location(Bukkit.getWorld("world"), 41, 16, 58), new Location(Bukkit.getWorld("world"), 7, 0, 9)),
+                    UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"), skull, new ArrayList<>()));
+        }
+
+        {
+            skullMeta.setDisplayName(ChatColor.GREEN + "Green Ball");
+            gameProfile = new GameProfile(UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd"), null);
+            gameProfile.getProperties().put("textures", new Property("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODU0ODRmNGI2MzY3Yjk1YmIxNjI4ODM5OGYxYzhkZDZjNjFkZTk4OGYzYTgzNTZkNGMzYWU3M2VhMzhhNDIifX19"));
+            lore.add(ChatColor.GRAY + "belongs to the " + ChatColor.GREEN + "green " + ChatColor.GRAY + "team.");
+
+            applySkullTexture(skull, skullMeta, gameProfile, lore);
+
+            team.add(new me.shreyasayyengar.pirateball.GameManagers.Team("Yellow",
+                    "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODU0ODRmNGI2MzY3Yjk1YmIxNjI4ODM5OGYxYzhkZDZjNjFkZTk4OGYzYTgzNTZkNGMzYWU3M2VhMzhhNDIifX19",
+                    ChatColor.GREEN, Color.GREEN, "&a", 'd',
+                    Material.GREEN_BANNER, Material.GREEN_BANNER, Material.GREEN_STAINED_GLASS,
+                    new CuboidRegion("world", new Location(Bukkit.getWorld("world"), 41, 16, 58), new Location(Bukkit.getWorld("world"), 7, 0, 9)),
+                    UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd"), skull, new ArrayList<>()));
+        }
+    }
+
+    public static void applySkullTexture(ItemStack skull, SkullMeta skullMeta, GameProfile gameProfile, ArrayList<String> lore) {
+        try {
+            Field field;
+            field = skullMeta.getClass().getDeclaredField("profile");
+            field.setAccessible(true);
+            field.set(skullMeta, gameProfile);
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException x) {
+            x.printStackTrace();
+        }
+
+        skullMeta.setLore(lore);
+        skull.setItemMeta(skullMeta);
     }
 
     public void addPlayer(Player player) {
@@ -59,14 +155,12 @@ public class Arena {
 
         for (Team team : Team.values()) {
             count.put(getTeamCount(team), team);
-
         }
 
         Team selected = (Team) count.values().toArray()[0];
         setTeam(player, selected);
 
         player.sendMessage(ChatColor.DARK_AQUA + "You have been put on the " + selected.getDisplayName() + ChatColor.DARK_AQUA + " team!");
-
 
         if (players.size() >= Config.getRequiredPlayers()) {
             countdown.begin();
@@ -164,10 +258,5 @@ public class Arena {
             }
         }
     }
-
-    public boolean isInTeamZone(CraftSkull block, Team team) {
-        return team.getTeamZone(team).isInRegion(block.getLocation());
-    }
-
 }
 
