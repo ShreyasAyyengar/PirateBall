@@ -311,5 +311,4 @@ public class GameListener implements Listener {
     private void onPlayerHandSwitch(PlayerSwapHandItemsEvent e) {
         e.setCancelled(true);
     }
-
 }
