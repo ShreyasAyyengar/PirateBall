@@ -51,6 +51,45 @@ public class Team {
         this.players = players;
     }
 
+    public void sendTeamMessage(String message) {
+        players.forEach(player -> Bukkit.getPlayer(player).sendMessage(message));
+    }
+
+    public void sendTeamTitle(String title, String subtitle, int in, int stay, int out) {
+        players.forEach(player -> Bukkit.getPlayer(player).sendTitle(title, subtitle, in, stay, out));
+    }
+
+    public void sendActionBar(String message, int duration) {
+
+        players.forEach(player -> sendActionBar(Bukkit.getPlayer(player), message));
+
+        if (duration >= 0) {
+            // Sends empty message at the end of the duration. This allows messages shorter than 3 seconds, ensures precision.
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    players.forEach(player -> sendActionBar(Bukkit.getPlayer(player), ""));
+                }
+            }.runTaskLater(PirateBall.getInstance(), duration + 1);
+        }
+
+        // Re-sends the messages every 3 seconds, so it doesn't go away from the player's screen.
+        while (duration > 40) {
+            duration -= 40;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    players.forEach(player -> sendActionBar(Bukkit.getPlayer(player), message));
+                }
+            }.runTaskLater(PirateBall.getInstance(), duration);
+        }
+    }
+
+    public void sendActionBar(Player player, String message) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+    }
+
+    // - Getters
     public String getDisplayName() {
         return displayName;
     }
@@ -101,43 +140,5 @@ public class Team {
 
     public List<UUID> getPlayers() {
         return players;
-    }
-
-    public void sendTeamMessage(String message) {
-        players.forEach(player -> Bukkit.getPlayer(player).sendMessage(message));
-    }
-
-    public void sendTeamTitle(String title, String subtitle, int in, int stay, int out) {
-        players.forEach(player -> Bukkit.getPlayer(player).sendTitle(title, subtitle, in, stay, out));
-    }
-
-    public void sendActionBar(String message, int duration) {
-
-        players.forEach(player -> sendActionBar(Bukkit.getPlayer(player), message));
-
-        if (duration >= 0) {
-            // Sends empty message at the end of the duration. This allows messages shorter than 3 seconds, ensures precision.
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    players.forEach(player -> sendActionBar(Bukkit.getPlayer(player), ""));
-                }
-            }.runTaskLater(PirateBall.getInstance(), duration + 1);
-        }
-
-        // Re-sends the messages every 3 seconds, so it doesn't go away from the player's screen.
-        while (duration > 40) {
-            duration -= 40;
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    players.forEach(player -> sendActionBar(Bukkit.getPlayer(player), message));
-                }
-            }.runTaskLater(PirateBall.getInstance(), duration);
-        }
-    }
-
-    public void sendActionBar(Player player, String message) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
     }
 }
